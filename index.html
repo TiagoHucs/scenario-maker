@@ -48,25 +48,13 @@
 
         var testSpec = criaMock();
 
-        var specHtml = tag(H1, testSpec.testTitle);
+        var specHtml = '';
+
+        specHtml += '<div>Editar</div>'
+        specHtml += tag(H1, testSpec.testTitle);
+
         specHtml += tag(P, testSpec.testDescription);
-
-        testSpec.testRules.forEach(r => {
-            specHtml += '<div class="rule">';
-            specHtml += tag(H2, r.ruleTitle);
-            specHtml += tag(P, r.ruleDecription);
-
-            r.ruleScenarios.forEach(scenario => {
-                specHtml += '<div class="scenario">';
-                specHtml += tag(H3, scenario.scenarioTitle);
-                specHtml += tagSteps(scenario.scenarioSteps);
-                specHtml += stepAddForm()
-                specHtml += '</div>';
-            })
-
-            specHtml += '</div>';
-        });
-
+        specHtml += renderRules(testSpec.testRules);
         document.getElementById('spec').innerHTML = specHtml;
 
         function tag(tag, text, attributes) {
@@ -81,7 +69,31 @@
             return htmlSnippet;
         }
 
-        function tagSteps(steps) {
+        function renderRules(rules){
+            htmlSnippet = '';
+            testSpec.testRules.forEach(r => {
+                htmlSnippet += '<div class="rules">';
+                htmlSnippet += tag(H2, r.ruleTitle);
+                htmlSnippet += tag(P, r.ruleDecription);
+                htmlSnippet += renderScenarios(r.ruleScenarios);
+                htmlSnippet += '</div>';
+            });
+            return htmlSnippet;
+        }
+
+        function renderScenarios(scenarios){
+            htmlSnippet = '';
+            scenarios.forEach(scenario => {
+                htmlSnippet += '<div class="scenario">';
+                htmlSnippet += tag(H3, scenario.scenarioTitle);
+                htmlSnippet += renderSteps(scenario.scenarioSteps);
+                htmlSnippet += stepAddForm()
+                htmlSnippet += '</div>';
+            })
+            return htmlSnippet;
+        }  
+
+        function renderSteps(steps) {
             htmlSnippet = '';
             steps.forEach(step => {
                 htmlSnippet += tag(DIV,
