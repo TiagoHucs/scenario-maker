@@ -1,0 +1,15 @@
+body { 
+    background-color: #f8f9fa; 
+}
+
+.float-add { 
+    position: fixed; 
+    right: 20px; 
+    bottom: 20px; 
+    z-index: 1050; 
+}
+
+pre.export-area { 
+    white-space: pre-wrap; 
+    word-break: break-word; 
+}
