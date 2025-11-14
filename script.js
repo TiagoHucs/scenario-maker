@@ -31,7 +31,7 @@ function renderScenarios() {
     console.log(scenarios);
 
     scenarios.forEach(s => {
-        htmlContent += scenarioHtml(s);
+        htmlContent += getScenarioByTemplate(s);
         scenarioList.innerHTML = htmlContent;
     });
 
@@ -74,6 +74,43 @@ function deleteScenario(scenarioId) {
         console.log(scenarios.filter(s => s.id !== scenarioId))
         renderScenarios();
     }
+}
+
+function geraId() {
+    //return crypto.randomUUID(); // completo
+    return crypto.randomUUID().split('-')[0];
+}
+
+/*-- html helpers --*/
+
+function getScenarioByTemplate(scenario) {
+
+    let qtdSteps = scenario.steps?.length;
+    if(!qtdSteps){
+        qtdSteps = 0;
+    }
+
+    let actualScenarioContent = document.getElementById('scenario-template').innerHTML;
+    return actualScenarioContent
+        .replaceAll('scenarioTitle', scenario.title)
+        .replaceAll('scenarioId', scenario.id)
+        .replaceAll('qtdSteps', qtdSteps + ' Steps')
+        
+        .replace('stepList', getStepsByTemplate(scenario.id, scenario.steps));
+}
+
+function getStepsByTemplate(scenarioId, steps) {
+    stepsContent = '';
+    if (Array.isArray(steps)) {
+        steps.forEach(st => {
+            let actualStepContent = document.getElementById('step-template').innerHTML;
+            stepsContent += actualStepContent
+                .replaceAll("stepText", st.text)
+                .replaceAll("stepId", st.id)
+                .replaceAll("scenarioId", scenarioId);
+        });
+    }
+    return stepsContent;
 }
 
 renderScenarios();
