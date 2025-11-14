@@ -25,6 +25,8 @@ let scenarios = [
 
 function renderScenarios() {
 
+    stepDuplicityAnalysis();
+
     scenarioList.innerHTML = '';
     htmlContent = '';
 
@@ -35,6 +37,16 @@ function renderScenarios() {
         scenarioList.innerHTML = htmlContent;
     });
 
+}
+
+function stepDuplicityAnalysis(){
+    scenarios.forEach(scenario => {
+        scenario.steps?.forEach(step => {
+            //step.duplicity = 10+'%'
+            qtd = step.text.length;
+            step.duplicity = qtd+'% de duplicidade'
+        });
+    });
 }
 
 function createScenario(title) {
@@ -107,6 +119,7 @@ function getStepsByTemplate(scenarioId, steps) {
             stepsContent += actualStepContent
                 .replaceAll("stepText", st.text)
                 .replaceAll("stepId", st.id)
+                .replace("stepDuplicity",st.duplicity)
                 .replaceAll("scenarioId", scenarioId);
         });
     }

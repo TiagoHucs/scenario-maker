@@ -13,3 +13,9 @@ pre.export-area {
     white-space: pre-wrap; 
     word-break: break-word; 
 }
+
+.step {
+  border: 1px solid;
+  padding: 5px;
+  box-shadow: 3px 5px #888888;
+}
