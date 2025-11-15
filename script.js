@@ -1,8 +1,3 @@
-const btnNew = document.getElementById('btnNewScenario');
-const btnExport = document.getElementById('btnExport');
-
-const scenarioList = document.getElementById('scenarioList');
-
 //mock de scenarios
 let scenarios = [
     {
@@ -14,10 +9,18 @@ let scenarios = [
     },
     {
         id: geraId(), title: 'Editar aluno', steps: [
-            { id: geraId(), text: 'Dado que tenha permissão' }
+            { id: geraId(), text: 'Dado que tenha permissão' },
+            { id: geraId(), text: 'Quando editar um aluno' },
+            { id: geraId(), text: 'Então retornará sucesso' }
         ]
     },
-    { id: geraId(), title: 'Excluir aluno' }
+    {
+        id: geraId(), title: 'Excluir aluno', steps: [
+            { id: geraId(), text: 'Dado que tenha permissão' },
+            { id: geraId(), text: 'Quando excluir um aluno' },
+            { id: geraId(), text: 'Então retornará sucesso' }
+        ]
+    }
 ];
 
 
@@ -25,49 +28,33 @@ let scenarios = [
 
 function renderScenarios() {
 
-    stepDuplicityAnalysis();
-
     scenarioList.innerHTML = '';
-    htmlContent = '';
+    let htmlContent = '';
 
     console.log(scenarios);
 
-    scenarios.forEach(s => {
+    for (const s of scenarios) {
         htmlContent += getScenarioByTemplate(s);
         scenarioList.innerHTML = htmlContent;
-    });
+    }
 
 }
 
-function stepDuplicityAnalysis(){
-    scenarios.forEach(scenario => {
-        scenario.steps?.forEach(step => {
-            //step.duplicity = 10+'%'
-            qtd = step.text.length;
-            step.duplicity = qtd+'% de duplicidade'
-        });
-    });
-}
-
-function createScenario(title) {
+function createScenario() {
+    const newTitle = prompt('Titulo do cenário:');
     const id = geraId();
-    const scenario = { id, title: title || `Cenário ${id}`, steps: [] };
+    const scenario = { id, title: newTitle || `Cenário ${id}`, steps: [] };
     scenarios.push(scenario);
     renderScenarios();
+    scrollToEnd();
 }
 
-function addStepToScenarioById(scenId, text) {
-    const scen = scenarios.find(s => Number(s.id) === Number(scenId));
+function editStep(scId, stId) {
+    const scen = scenarios.find(s => String(s.id) === String(scId));
     if (!scen) return;
-    scen.steps.push({ id: geraId(), text: text, scenId: scenId });
-    renderScenarios();
-}
-
-function editStepInScenario(id, id, newText) {
-    const scen = scenarios.find(s => Number(s.id) === Number(id));
-    if (!scen) return;
-    const st = scen.steps.find(x => String(x.id) === String(id));
+    const st = scen.steps.find(x => String(x.id) === String(stId));
     if (!st) return;
+    const newText = prompt('Texto do step:', st.text);
     st.text = newText;
     renderScenarios();
 }
@@ -88,9 +75,55 @@ function deleteScenario(scenarioId) {
     }
 }
 
+function editScenario(scId) {
+    const scen = scenarios.find(s => String(s.id) === String(scId));
+    if (!scen) return;
+    const newTitle = prompt('Título do cenário:', scen.title);
+    scen.title = newTitle;
+    renderScenarios();
+}
+
+function newStep(scId) {
+    const scen = scenarios.find(s => String(s.id) === String(scId));
+    if (!scen) return;
+    const newText = prompt('Texto do step:');
+    scen.steps.push({ id: geraId(), text: newText });
+    renderScenarios();
+}
+
 function geraId() {
-    //return crypto.randomUUID(); // completo
     return crypto.randomUUID().split('-')[0];
+}
+
+function gerarFeature() {
+    let feature = `Funcionalidade: funcionalidade de teste\n\n`;
+
+    for (const sc of scenarios) {
+        feature += `  Cenário: ${sc.title}\n`;
+        for (const st of sc.steps) {
+            feature += `    ${st.text}\n`;
+        }
+        feature += "\n";
+    }
+
+    console.log(feature.trim())
+
+    return feature.trim();
+}
+
+function downloadFeature() {
+    const conteudo = gerarFeature();
+    const blob = new Blob([conteudo], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cenarios.feature"; // nome do arquivo
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
 }
 
 /*-- html helpers --*/
@@ -98,7 +131,7 @@ function geraId() {
 function getScenarioByTemplate(scenario) {
 
     let qtdSteps = scenario.steps?.length;
-    if(!qtdSteps){
+    if (!qtdSteps) {
         qtdSteps = 0;
     }
 
@@ -107,24 +140,30 @@ function getScenarioByTemplate(scenario) {
         .replaceAll('scenarioTitle', scenario.title)
         .replaceAll('scenarioId', scenario.id)
         .replaceAll('qtdSteps', qtdSteps + ' Steps')
-        
+
         .replace('stepList', getStepsByTemplate(scenario.id, scenario.steps));
 }
 
 function getStepsByTemplate(scenarioId, steps) {
-    stepsContent = '';
+    let stepsContent = '';
     if (Array.isArray(steps)) {
-        steps.forEach(st => {
+        for (let st of steps) {
             let actualStepContent = document.getElementById('step-template').innerHTML;
             stepsContent += actualStepContent
                 .replaceAll("stepText", st.text)
                 .replaceAll("stepId", st.id)
-                .replace("stepDuplicity",st.duplicity)
+                .replace("stepDuplicity", st.duplicity)
                 .replaceAll("scenarioId", scenarioId);
-        });
+        }
     }
     return stepsContent;
 }
 
-renderScenarios();
+/*--efects--*/
 
+function scrollToEnd() {
+    window.scrollTo({
+        top: document.body.scrollHeight,
+        behavior: "smooth"
+    });
+}
